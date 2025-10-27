@@ -78,6 +78,16 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // Listen for delete result from AddSegmentFragment
+        parentFragmentManager.setFragmentResultListener("delete_segment_result", this) { _, bundle ->
+            val isDelete = bundle.getBoolean("is_delete", false)
+            val segmentIndex = bundle.getInt("segment_index", -1)
+            
+            if (isDelete && segmentIndex >= 0) {
+                homeViewModel.deleteSegment(segmentIndex)
+            }
+        }
+
         return root
     }
 

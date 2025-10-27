@@ -27,6 +27,14 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    fun deleteSegment(index: Int) {
+        val currentList = _segments.value?.toMutableList() ?: mutableListOf()
+        if (index >= 0 && index < currentList.size) {
+            currentList.removeAt(index)
+            _segments.value = currentList
+        }
+    }
+
     fun removeSegment(segment: Segment) {
         val currentList = _segments.value?.toMutableList() ?: mutableListOf()
         currentList.remove(segment)

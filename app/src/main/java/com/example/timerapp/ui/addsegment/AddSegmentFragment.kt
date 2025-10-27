@@ -1,5 +1,6 @@
 package com.example.timerapp.ui.addsegment
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -41,9 +42,11 @@ class AddSegmentFragment : Fragment() {
             binding.textTitle.text = "Edit Segment"
             binding.editTextSegmentName.setText(segmentName)
             binding.buttonSave.text = "Update"
+            binding.buttonDelete.visibility = View.VISIBLE
         } else {
             binding.textTitle.text = "Add New Segment"
             binding.buttonSave.text = "Save"
+            binding.buttonDelete.visibility = View.GONE
         }
 
         binding.buttonSave.setOnClickListener {
@@ -78,6 +81,10 @@ class AddSegmentFragment : Fragment() {
             findNavController().navigateUp()
         }
 
+        binding.buttonDelete.setOnClickListener {
+            showDeleteConfirmationDialog()
+        }
+
         // Focus on the EditText when the fragment opens
         binding.editTextSegmentName.requestFocus()
         
@@ -85,6 +92,27 @@ class AddSegmentFragment : Fragment() {
         if (isEditMode) {
             binding.editTextSegmentName.selectAll()
         }
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delete Segment")
+            .setMessage("Are you sure you want to delete \"$segmentName\"? This action cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                // Create a bundle to pass the delete result back
+                val result = Bundle().apply {
+                    putBoolean("is_delete", true)
+                    putInt("segment_index", segmentIndex)
+                }
+                
+                // Set the result for the parent fragment to receive
+                parentFragmentManager.setFragmentResult("delete_segment_result", result)
+                
+                // Navigate back
+                findNavController().navigateUp()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     override fun onDestroyView() {
