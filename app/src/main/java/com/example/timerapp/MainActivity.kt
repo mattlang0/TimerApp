@@ -26,8 +26,11 @@ private lateinit var binding: ActivityMainBinding
         setSupportActionBar(binding.appBarMain.toolbar)
 
         binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            val navController = findNavController(R.id.nav_host_fragment_content_main)
+            // Only navigate to add segment if we're currently on the home fragment
+            if (navController.currentDestination?.id == R.id.nav_home) {
+                navController.navigate(R.id.action_nav_home_to_addSegmentFragment)
+            }
         }
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView

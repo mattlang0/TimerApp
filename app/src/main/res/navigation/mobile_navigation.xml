@@ -9,7 +9,11 @@
         android:id="@+id/nav_home"
         android:name="com.example.timerapp.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_addSegmentFragment"
+            app:destination="@id/addSegmentFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_gallery"
@@ -22,4 +26,10 @@
         android:name="com.example.timerapp.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/addSegmentFragment"
+        android:name="com.example.timerapp.ui.addsegment.AddSegmentFragment"
+        android:label="Add Segment"
+        tools:layout="@layout/fragment_add_segment" />
 </navigation>

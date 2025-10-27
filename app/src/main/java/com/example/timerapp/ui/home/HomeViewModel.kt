@@ -8,13 +8,8 @@ import com.example.timerapp.model.Segment
 class HomeViewModel : ViewModel() {
 
     private val _segments = MutableLiveData<List<Segment>>().apply {
-        // Start with some sample segments for demonstration
-        value = listOf(
-            Segment("Morning Routine"),
-            Segment("Work Session"),
-            Segment("Lunch Break"),
-            Segment("Exercise")
-        )
+        // Start with an empty list so users can add their own segments
+        value = emptyList()
     }
     val segments: LiveData<List<Segment>> = _segments
 

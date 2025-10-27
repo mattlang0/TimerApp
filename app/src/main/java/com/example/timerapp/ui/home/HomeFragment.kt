@@ -17,13 +17,14 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var segmentAdapter: SegmentAdapter
+    private lateinit var homeViewModel: HomeViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
+        homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -47,6 +48,14 @@ class HomeFragment : Fragment() {
             } else {
                 binding.recyclerViewSegments.visibility = View.VISIBLE
                 binding.textEmptyState.visibility = View.GONE
+            }
+        }
+
+        // Listen for result from AddSegmentFragment
+        parentFragmentManager.setFragmentResultListener("add_segment_result", this) { _, bundle ->
+            val segmentName = bundle.getString("segment_name")
+            segmentName?.let {
+                homeViewModel.addSegment(com.example.timerapp.model.Segment(it))
             }
         }
 
