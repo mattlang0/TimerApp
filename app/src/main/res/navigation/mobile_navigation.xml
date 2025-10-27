@@ -31,5 +31,15 @@
         android:id="@+id/addSegmentFragment"
         android:name="com.example.timerapp.ui.addsegment.AddSegmentFragment"
         android:label="Add Segment"
-        tools:layout="@layout/fragment_add_segment" />
+        tools:layout="@layout/fragment_add_segment" >
+        <argument
+            android:name="segmentName"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="segmentIndex"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
 </navigation>

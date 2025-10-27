@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.timerapp.R
 import com.example.timerapp.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -31,7 +33,14 @@ class HomeFragment : Fragment() {
         val root: View = binding.root
 
         // Set up RecyclerView
-        segmentAdapter = SegmentAdapter(emptyList())
+        segmentAdapter = SegmentAdapter(emptyList()) { segment, position ->
+            // Navigate to edit mode when segment is clicked
+            val bundle = Bundle().apply {
+                putString("segmentName", segment.name)
+                putInt("segmentIndex", position)
+            }
+            findNavController().navigate(R.id.action_nav_home_to_addSegmentFragment, bundle)
+        }
         binding.recyclerViewSegments.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = segmentAdapter
@@ -51,11 +60,21 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Listen for result from AddSegmentFragment
+        // Listen for result from AddSegmentFragment (add mode)
         parentFragmentManager.setFragmentResultListener("add_segment_result", this) { _, bundle ->
             val segmentName = bundle.getString("segment_name")
             segmentName?.let {
                 homeViewModel.addSegment(com.example.timerapp.model.Segment(it))
+            }
+        }
+
+        // Listen for result from AddSegmentFragment (edit mode)
+        parentFragmentManager.setFragmentResultListener("edit_segment_result", this) { _, bundle ->
+            val segmentName = bundle.getString("segment_name")
+            val segmentIndex = bundle.getInt("segment_index", -1)
+            
+            if (segmentName != null && segmentIndex >= 0) {
+                homeViewModel.updateSegment(segmentIndex, com.example.timerapp.model.Segment(segmentName))
             }
         }
 
