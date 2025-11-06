@@ -16,31 +16,33 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
+    private val binding
+        get() = _binding!!
 
     private lateinit var segmentAdapter: SegmentAdapter
     private lateinit var homeViewModel: HomeViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
-        homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         // Set up RecyclerView
-        segmentAdapter = SegmentAdapter(emptyList()) { segment, position ->
-            // Navigate to edit mode when segment is clicked
-            val bundle = Bundle().apply {
-                putString("segmentName", segment.name)
-                putInt("segmentIndex", position)
-            }
-            findNavController().navigate(R.id.action_nav_home_to_addSegmentFragment, bundle)
-        }
+        segmentAdapter =
+                SegmentAdapter(emptyList()) { segment, position ->
+                    // Navigate to edit mode when segment is clicked
+                    val bundle =
+                            Bundle().apply {
+                                putString("segmentName", segment.name)
+                                putInt("segmentIndex", position)
+                            }
+                    findNavController().navigate(R.id.action_nav_home_to_addSegmentFragment, bundle)
+                }
         binding.recyclerViewSegments.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = segmentAdapter
@@ -49,7 +51,7 @@ class HomeFragment : Fragment() {
         // Observe segments list
         homeViewModel.segments.observe(viewLifecycleOwner) { segments ->
             segmentAdapter.updateSegments(segments)
-            
+
             // Show/hide empty state
             if (segments.isEmpty()) {
                 binding.recyclerViewSegments.visibility = View.GONE
@@ -64,7 +66,14 @@ class HomeFragment : Fragment() {
         parentFragmentManager.setFragmentResultListener("add_segment_result", this) { _, bundle ->
             val segmentName = bundle.getString("segment_name")
             segmentName?.let {
-                homeViewModel.addSegment(com.timerapp.model.Segment(it))
+                homeViewModel.addSegment(
+                        com.timerapp.model.Segment(
+                                name = it,
+                                createTrigger = { execute ->
+                                    com.timerapp.model.Trigger.ManualTrigger(execute)
+                                }
+                        )
+                )
             }
         }
 
@@ -72,17 +81,26 @@ class HomeFragment : Fragment() {
         parentFragmentManager.setFragmentResultListener("edit_segment_result", this) { _, bundle ->
             val segmentName = bundle.getString("segment_name")
             val segmentIndex = bundle.getInt("segment_index", -1)
-            
+
             if (segmentName != null && segmentIndex >= 0) {
-                homeViewModel.updateSegment(segmentIndex, com.timerapp.model.Segment(segmentName))
+                homeViewModel.updateSegment(
+                        segmentIndex,
+                        com.timerapp.model.Segment(
+                                name = segmentName,
+                                createTrigger = { execute ->
+                                    com.timerapp.model.Trigger.ManualTrigger(execute)
+                                }
+                        )
+                )
             }
         }
 
         // Listen for delete result from AddSegmentFragment
-        parentFragmentManager.setFragmentResultListener("delete_segment_result", this) { _, bundle ->
+        parentFragmentManager.setFragmentResultListener("delete_segment_result", this) { _, bundle
+            ->
             val isDelete = bundle.getBoolean("is_delete", false)
             val segmentIndex = bundle.getInt("segment_index", -1)
-            
+
             if (isDelete && segmentIndex >= 0) {
                 homeViewModel.deleteSegment(segmentIndex)
             }
