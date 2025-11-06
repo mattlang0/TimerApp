@@ -1,4 +1,4 @@
-package com.example.timerapp
+package com.timerapp
 import android.os.Bundle
 import android.view.Menu
 import com.google.android.material.snackbar.Snackbar
@@ -10,7 +10,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.example.timerapp.databinding.ActivityMainBinding
+import com.timerapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

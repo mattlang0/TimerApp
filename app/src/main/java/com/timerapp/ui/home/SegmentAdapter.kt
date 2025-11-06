@@ -1,10 +1,10 @@
-package com.example.timerapp.ui.home
+package com.timerapp.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.timerapp.databinding.ItemSegmentBinding
-import com.example.timerapp.model.Segment
+import com.timerapp.databinding.ItemSegmentBinding
+import com.timerapp.model.Segment
 
 class SegmentAdapter(
     private var segments: List<Segment>,

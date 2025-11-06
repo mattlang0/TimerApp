@@ -1,4 +1,4 @@
-package com.example.timerapp.ui.home
+package com.timerapp.ui.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.timerapp.R
-import com.example.timerapp.databinding.FragmentHomeBinding
+import com.timerapp.R
+import com.timerapp.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
 
@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
         parentFragmentManager.setFragmentResultListener("add_segment_result", this) { _, bundle ->
             val segmentName = bundle.getString("segment_name")
             segmentName?.let {
-                homeViewModel.addSegment(com.example.timerapp.model.Segment(it))
+                homeViewModel.addSegment(com.timerapp.model.Segment(it))
             }
         }
 
@@ -74,7 +74,7 @@ class HomeFragment : Fragment() {
             val segmentIndex = bundle.getInt("segment_index", -1)
             
             if (segmentName != null && segmentIndex >= 0) {
-                homeViewModel.updateSegment(segmentIndex, com.example.timerapp.model.Segment(segmentName))
+                homeViewModel.updateSegment(segmentIndex, com.timerapp.model.Segment(segmentName))
             }
         }
 

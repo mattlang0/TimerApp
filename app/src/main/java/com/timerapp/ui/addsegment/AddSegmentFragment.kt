@@ -1,4 +1,4 @@
-package com.example.timerapp.ui.addsegment
+package com.timerapp.ui.addsegment
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.timerapp.databinding.FragmentAddSegmentBinding
+import com.timerapp.databinding.FragmentAddSegmentBinding
 
 class AddSegmentFragment : Fragment() {
 

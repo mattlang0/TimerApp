@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.timerapp"
+    namespace = "com.timerapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.timerapp"
+        applicationId = "com.timerapp"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

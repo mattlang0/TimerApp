@@ -1,9 +1,9 @@
-package com.example.timerapp.ui.home
+package com.timerapp.ui.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.timerapp.model.Segment
+import com.timerapp.model.Segment
 
 class HomeViewModel : ViewModel() {
 

@@ -5,9 +5,9 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/nav_home">
 
-    <fragment
+        <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.timerapp.ui.home.HomeFragment"
+        android:name="com.timerapp.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -17,19 +17,19 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.example.timerapp.ui.gallery.GalleryFragment"
+        android:name="com.timerapp.ui.gallery.GalleryFragment"
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_gallery" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="com.example.timerapp.ui.slideshow.SlideshowFragment"
+        android:name="com.timerapp.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
 
     <fragment
         android:id="@+id/addSegmentFragment"
-        android:name="com.example.timerapp.ui.addsegment.AddSegmentFragment"
+        android:name="com.timerapp.ui.addsegment.AddSegmentFragment"
         android:label="Add Segment"
         tools:layout="@layout/fragment_add_segment" >
         <argument

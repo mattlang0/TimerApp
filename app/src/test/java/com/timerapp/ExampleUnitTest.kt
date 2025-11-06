@@ -1,4 +1,4 @@
-package com.example.timerapp
+package com.timerapp
 
 import org.junit.Test
 
