@@ -69,9 +69,7 @@ class HomeFragment : Fragment() {
                 homeViewModel.addSegment(
                         com.timerapp.model.Segment(
                                 name = it,
-                                createTrigger = { execute ->
-                                    com.timerapp.model.Trigger.ManualTrigger(execute)
-                                }
+                                triggerConfig = com.timerapp.model.TriggerConfig.Manual(delay = 0)
                         )
                 )
             }
@@ -87,9 +85,7 @@ class HomeFragment : Fragment() {
                         segmentIndex,
                         com.timerapp.model.Segment(
                                 name = segmentName,
-                                createTrigger = { execute ->
-                                    com.timerapp.model.Trigger.ManualTrigger(execute)
-                                }
+                                triggerConfig = com.timerapp.model.TriggerConfig.Manual(delay = 0)
                         )
                 )
             }

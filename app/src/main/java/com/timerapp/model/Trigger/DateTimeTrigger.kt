@@ -1,15 +1,24 @@
 package com.timerapp.model.Trigger
 
-class DateTimeTrigger(
-    override val execute: () -> Unit
-) : Trigger {
+import java.time.LocalDateTime
+
+class DateTimeTrigger(private val onExecute: () -> Unit) : Trigger {
     var isEnabled: Boolean = false
+    var scheduledTime: LocalDateTime? = null
+
+    override fun execute() {
+        if (isEnabled) {
+            onExecute()
+        }
+    }
 
     fun enable() {
-        // TODO: Implement enable logic
+        isEnabled = true
+        // TODO: Implement enable logic (e.g., schedule alarm)
     }
 
     fun disable() {
-        // TODO: Implement disable logic
+        isEnabled = false
+        // TODO: Implement disable logic (e.g., cancel alarm)
     }
 }
