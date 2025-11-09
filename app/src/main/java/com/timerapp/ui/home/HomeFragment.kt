@@ -10,6 +10,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.timerapp.R
 import com.timerapp.databinding.FragmentHomeBinding
+import com.timerapp.model.Effect.Effect
+import com.timerapp.model.Effect.PauseEffect
+import com.timerapp.model.Effect.VibrateEffect
+import com.timerapp.model.EffectType
 import com.timerapp.model.TriggerConfig
 import com.timerapp.model.TriggerType
 import java.time.LocalDateTime
@@ -60,6 +64,25 @@ class HomeFragment : Fragment() {
                                         putBoolean("trigger_enabled", config.isEnabled)
                                     }
                                 }
+                                // Pass effects
+                                putInt("effects_count", segment.effects.size)
+                                segment.effects.forEachIndexed { index, effect ->
+                                    when (effect) {
+                                        is VibrateEffect -> {
+                                            putSerializable(
+                                                    "effect_${index}_type",
+                                                    EffectType.VIBRATE
+                                            )
+                                        }
+                                        is PauseEffect -> {
+                                            putSerializable(
+                                                    "effect_${index}_type",
+                                                    EffectType.PAUSE
+                                            )
+                                            putInt("effect_${index}_duration", effect.duration)
+                                        }
+                                    }
+                                }
                             }
                     findNavController().navigate(R.id.action_nav_home_to_addSegmentFragment, bundle)
                 }
@@ -86,10 +109,15 @@ class HomeFragment : Fragment() {
         parentFragmentManager.setFragmentResultListener("add_segment_result", this) { _, bundle ->
             val segmentName = bundle.getString("segment_name")
             val triggerConfig = extractTriggerConfigFromBundle(bundle)
+            val effects = extractEffectsFromBundle(bundle)
 
             segmentName?.let {
                 homeViewModel.addSegment(
-                        com.timerapp.model.Segment(name = it, triggerConfig = triggerConfig)
+                        com.timerapp.model.Segment(
+                                name = it,
+                                effects = effects,
+                                triggerConfig = triggerConfig
+                        )
                 )
             }
         }
@@ -99,12 +127,14 @@ class HomeFragment : Fragment() {
             val segmentName = bundle.getString("segment_name")
             val segmentIndex = bundle.getInt("segment_index", -1)
             val triggerConfig = extractTriggerConfigFromBundle(bundle)
+            val effects = extractEffectsFromBundle(bundle)
 
             if (segmentName != null && segmentIndex >= 0) {
                 homeViewModel.updateSegment(
                         segmentIndex,
                         com.timerapp.model.Segment(
                                 name = segmentName,
+                                effects = effects,
                                 triggerConfig = triggerConfig
                         )
                 )
@@ -146,6 +176,27 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun extractEffectsFromBundle(bundle: Bundle): Array<Effect> {
+        val effectsCount = bundle.getInt("effects_count", 0)
+        val effects = mutableListOf<Effect>()
+
+        for (i in 0 until effectsCount) {
+            val effectType = bundle.getSerializable("effect_${i}_type") as? EffectType
+            when (effectType) {
+                EffectType.VIBRATE -> {
+                    effects.add(VibrateEffect())
+                }
+                EffectType.PAUSE -> {
+                    val duration = bundle.getInt("effect_${i}_duration", 5)
+                    effects.add(PauseEffect(duration))
+                }
+                null -> {} // Skip invalid effects
+            }
+        }
+
+        return effects.toTypedArray()
     }
 
     override fun onDestroyView() {

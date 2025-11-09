@@ -9,7 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.textfield.TextInputEditText
 import com.timerapp.databinding.FragmentAddSegmentBinding
+import com.timerapp.model.Effect.Effect
+import com.timerapp.model.Effect.PauseEffect
+import com.timerapp.model.Effect.VibrateEffect
+import com.timerapp.model.EffectType
 import com.timerapp.model.TriggerConfig
 import com.timerapp.model.TriggerType
 import java.time.LocalDateTime
@@ -30,6 +36,10 @@ class AddSegmentFragment : Fragment() {
     private var selectedTriggerType = TriggerType.MANUAL
     private var selectedDateTime: LocalDateTime? = null
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' hh:mm a")
+
+    // Effects-related state
+    private val effectsList = mutableListOf<Effect>()
+    private lateinit var effectAdapter: EffectAdapter
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -64,6 +74,22 @@ class AddSegmentFragment : Fragment() {
             }
         }
 
+        // Load existing effects if in edit mode
+        val effectsCount = arguments?.getInt("effects_count", 0) ?: 0
+        for (i in 0 until effectsCount) {
+            val effectType = arguments?.getSerializable("effect_${i}_type") as? EffectType
+            when (effectType) {
+                EffectType.VIBRATE -> {
+                    effectsList.add(VibrateEffect())
+                }
+                EffectType.PAUSE -> {
+                    val duration = arguments?.getInt("effect_${i}_duration", 5) ?: 5
+                    effectsList.add(PauseEffect(duration))
+                }
+                null -> {}
+            }
+        }
+
         // Check if we're in edit mode
         isEditMode = segmentName != null && segmentIndex >= 0
 
@@ -80,6 +106,7 @@ class AddSegmentFragment : Fragment() {
         }
 
         setupTriggerUI()
+        setupEffectsUI()
 
         binding.buttonSave.setOnClickListener {
             val segmentName = binding.editTextSegmentName.text.toString().trim()
@@ -126,6 +153,19 @@ class AddSegmentFragment : Fragment() {
                             }
                             null -> {} // Should not happen due to validation above
                         }
+                        // Add effects array
+                        putInt("effects_count", effectsList.size)
+                        effectsList.forEachIndexed { index, effect ->
+                            when (effect) {
+                                is VibrateEffect -> {
+                                    putSerializable("effect_${index}_type", EffectType.VIBRATE)
+                                }
+                                is PauseEffect -> {
+                                    putSerializable("effect_${index}_type", EffectType.PAUSE)
+                                    putInt("effect_${index}_duration", effect.duration)
+                                }
+                            }
+                        }
                     }
 
             // Set the result for the parent fragment to receive
@@ -155,12 +195,12 @@ class AddSegmentFragment : Fragment() {
             when (checkedId) {
                 binding.radioManualTrigger.id -> {
                     selectedTriggerType = TriggerType.MANUAL
-                    binding.textInputLayoutDelay.visibility = View.VISIBLE
+                    binding.layoutManualTrigger.visibility = View.VISIBLE
                     binding.layoutDatetimeTrigger.visibility = View.GONE
                 }
                 binding.radioDatetimeTrigger.id -> {
                     selectedTriggerType = TriggerType.DATETIME
-                    binding.textInputLayoutDelay.visibility = View.GONE
+                    binding.layoutManualTrigger.visibility = View.GONE
                     binding.layoutDatetimeTrigger.visibility = View.VISIBLE
                 }
             }
@@ -171,6 +211,9 @@ class AddSegmentFragment : Fragment() {
 
         // Set up time picker
         binding.buttonSelectTime.setOnClickListener { showTimePicker() }
+
+        // Set up play button
+        binding.buttonPlaySegment.setOnClickListener { executeSegment() }
 
         // Populate UI with existing trigger data if in edit mode
         when (selectedTriggerType) {
@@ -186,6 +229,31 @@ class AddSegmentFragment : Fragment() {
                 updateDateTimeDisplay()
             }
         }
+    }
+
+    private fun executeSegment() {
+        // Create a temporary segment with current configuration
+        val effects = effectsList.toTypedArray()
+
+        if (effects.isEmpty()) {
+            AlertDialog.Builder(requireContext())
+                    .setTitle("No Effects")
+                    .setMessage("Please add at least one effect to execute the segment.")
+                    .setPositiveButton("OK", null)
+                    .show()
+            return
+        }
+
+        val triggerConfig = getTriggerConfig() ?: TriggerConfig.Manual(delay = 0)
+        val segment =
+                com.timerapp.model.Segment(
+                        name = binding.editTextSegmentName.text.toString().ifEmpty { "Preview" },
+                        effects = effects,
+                        triggerConfig = triggerConfig
+                )
+
+        // Execute the segment
+        segment.execute()
     }
 
     private fun showDatePicker() {
@@ -299,6 +367,85 @@ class AddSegmentFragment : Fragment() {
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+    }
+
+    private fun setupEffectsUI() {
+        // Set up RecyclerView
+        effectAdapter =
+                EffectAdapter(effectsList) { position ->
+                    // Delete effect
+                    effectsList.removeAt(position)
+                    effectAdapter.notifyItemRemoved(position)
+                    updateEffectsEmptyState()
+                }
+
+        binding.recyclerViewEffects.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = effectAdapter
+        }
+
+        // Add Effect button
+        binding.buttonAddEffect.setOnClickListener { showEffectTypeSelectionDialog() }
+
+        updateEffectsEmptyState()
+    }
+
+    private fun showEffectTypeSelectionDialog() {
+        val effectTypes = arrayOf("Vibrate", "Pause")
+
+        AlertDialog.Builder(requireContext())
+                .setTitle("Select Effect Type")
+                .setItems(effectTypes) { _, which ->
+                    when (which) {
+                        0 -> addVibrateEffect()
+                        1 -> showPauseDurationDialog()
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+    }
+
+    private fun addVibrateEffect() {
+        effectsList.add(VibrateEffect())
+        effectAdapter.notifyItemInserted(effectsList.size - 1)
+        updateEffectsEmptyState()
+    }
+
+    private fun showPauseDurationDialog() {
+        val input =
+                TextInputEditText(requireContext()).apply {
+                    inputType = android.text.InputType.TYPE_CLASS_NUMBER
+                    hint = "Duration (seconds)"
+                    setText("5")
+                }
+
+        val container =
+                android.widget.FrameLayout(requireContext()).apply {
+                    setPadding(50, 20, 50, 0)
+                    addView(input)
+                }
+
+        AlertDialog.Builder(requireContext())
+                .setTitle("Pause Duration")
+                .setView(container)
+                .setPositiveButton("Add") { _, _ ->
+                    val duration = input.text.toString().toIntOrNull() ?: 5
+                    effectsList.add(PauseEffect(duration))
+                    effectAdapter.notifyItemInserted(effectsList.size - 1)
+                    updateEffectsEmptyState()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+    }
+
+    private fun updateEffectsEmptyState() {
+        if (effectsList.isEmpty()) {
+            binding.textEffectsEmpty.visibility = View.VISIBLE
+            binding.recyclerViewEffects.visibility = View.GONE
+        } else {
+            binding.textEffectsEmpty.visibility = View.GONE
+            binding.recyclerViewEffects.visibility = View.VISIBLE
+        }
     }
 
     override fun onDestroyView() {
