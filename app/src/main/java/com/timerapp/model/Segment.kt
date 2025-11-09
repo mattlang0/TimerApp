@@ -1,8 +1,6 @@
 package com.timerapp.model
 
 import com.timerapp.model.Effect.Effect
-import com.timerapp.model.Trigger.DateTimeTrigger
-import com.timerapp.model.Trigger.ManualTrigger
 import com.timerapp.model.Trigger.Trigger
 
 /**
@@ -45,29 +43,15 @@ class Segment(
     }
 
     /**
-     * Create a Trigger instance based on current configuration. Call this when you're ready to
-     * execute the segment.
+     * Create a Trigger instance based on current configuration. Call this when you're ready to set
+     * up the trigger for this segment. The trigger will call execute() when it fires.
      */
     fun createTrigger(): Trigger {
-        return when (val config = triggerConfig) {
-            is TriggerConfig.Manual ->
-                    ManualTrigger({ executeEffects() }).apply { delay = config.delay }
-            is TriggerConfig.DateTime ->
-                    DateTimeTrigger({ executeEffects() }).apply {
-                        isEnabled = config.isEnabled
-                        scheduledTime = config.time
-                    }
-        }
+        return TriggerFactory.create(triggerConfig) { execute() }
     }
 
-    /**
-     * Execute the segment's effects directly. This creates a trigger and executes it immediately.
-     */
+    /** Execute the segment's effects in sequence. */
     fun execute() {
-        createTrigger().execute()
-    }
-
-    private fun executeEffects() {
         effects.forEach { effect -> effect.execute() }
     }
 }
