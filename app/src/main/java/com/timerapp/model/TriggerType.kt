@@ -1,6 +1,8 @@
 package com.timerapp.model
 
-enum class TriggerType {
+import java.io.Serializable
+
+enum class TriggerType : Serializable {
     MANUAL,
     DATETIME
 }
