@@ -118,8 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="▶ Execute Segment"
-                style="@style/Widget.Material3.Button.OutlinedButton" />
+                android:text="▶ Execute Segment" />
 
         </LinearLayout>
 
@@ -135,16 +134,14 @@
                 android:id="@+id/button_select_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Select Date"
-                style="@style/Widget.Material3.Button.OutlinedButton" />
+                android:text="Select Date" />
 
             <Button
                 android:id="@+id/button_select_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Select Time"
-                style="@style/Widget.Material3.Button.OutlinedButton" />
+                android:text="Select Time" />
 
             <TextView
                 android:id="@+id/text_selected_datetime"
@@ -215,7 +212,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="+ Add Effect"
-        style="@style/Widget.Material3.Button.OutlinedButton"
         app:layout_constraintTop_toBottomOf="@id/effects_content_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -229,7 +225,6 @@
         android:textColor="@android:color/white"
         android:backgroundTint="@android:color/holo_red_dark"
         android:visibility="gone"
-        style="@style/Widget.Material3.Button"
         app:layout_constraintTop_toBottomOf="@id/button_add_effect"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -249,8 +244,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="Cancel"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
+            android:text="Cancel" />
 
         <Button
             android:id="@+id/button_save"
