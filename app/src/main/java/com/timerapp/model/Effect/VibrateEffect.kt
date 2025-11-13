@@ -1,5 +1,7 @@
 package com.timerapp.model.Effect
 
+import com.timerapp.service.VibrateService
+
 /**
  * VibrateEffect triggers device vibration. No configuration needed.
  *
@@ -11,7 +13,6 @@ package com.timerapp.model.Effect
  */
 class VibrateEffect : Effect {
     override fun execute() {
-        // TODO: Implement vibrate logic using Android Vibrator API
-        println("Vibrating device")
+        VibrateService.vibrate()
     }
 }
