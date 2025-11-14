@@ -1,6 +1,7 @@
 package com.timerapp
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -41,6 +42,15 @@ private lateinit var binding: ActivityMainBinding
             R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        
+        // Show/hide FAB based on current destination
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.nav_home) {
+                binding.appBarMain.fab.show()
+            } else {
+                binding.appBarMain.fab.hide()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
