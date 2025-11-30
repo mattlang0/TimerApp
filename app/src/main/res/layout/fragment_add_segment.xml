@@ -101,13 +101,6 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
-                android:id="@+id/button_play_segment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="▶ Execute Segment" />
-
         </LinearLayout>
 
         <!-- DateTime Trigger Settings -->
@@ -139,14 +132,6 @@
                 android:text="No date/time selected"
                 android:textSize="14sp"
                 android:gravity="center" />
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switch_trigger_enabled"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Enable Trigger"
-                android:checked="false" />
 
         </LinearLayout>
 

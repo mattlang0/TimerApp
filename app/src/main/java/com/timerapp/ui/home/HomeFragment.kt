@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.timerapp.R
@@ -17,6 +18,7 @@ import com.timerapp.model.EffectType
 import com.timerapp.model.TriggerConfig
 import com.timerapp.model.TriggerType
 import java.time.LocalDateTime
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -41,52 +43,73 @@ class HomeFragment : Fragment() {
 
         // Set up RecyclerView
         segmentAdapter =
-                SegmentAdapter(emptyList()) { segment, position ->
-                    // Navigate to edit mode when segment is clicked
-                    val bundle =
-                            Bundle().apply {
-                                putString("title", "Edit Segment")
-                                putString("segmentName", segment.name)
-                                putInt("segmentIndex", position)
-                                // Pass trigger configuration
-                                putSerializable(
-                                        "trigger_type",
-                                        when (segment.triggerConfig) {
-                                            is TriggerConfig.Manual -> TriggerType.MANUAL
-                                            is TriggerConfig.DateTime -> TriggerType.DATETIME
+                SegmentAdapter(
+                        emptyList(),
+                        onItemClick = { segment, position ->
+                            // Navigate to edit mode when segment is clicked
+                            val bundle =
+                                    Bundle().apply {
+                                        putString("title", "Edit Segment")
+                                        putString("segmentName", segment.name)
+                                        putInt("segmentIndex", position)
+                                        // Pass trigger configuration
+                                        putSerializable(
+                                                "trigger_type",
+                                                when (segment.triggerConfig) {
+                                                    is TriggerConfig.Manual -> TriggerType.MANUAL
+                                                    is TriggerConfig.DateTime ->
+                                                            TriggerType.DATETIME
+                                                }
+                                        )
+                                        when (val config = segment.triggerConfig) {
+                                            is TriggerConfig.Manual -> {
+                                                putInt("trigger_delay", config.delay)
+                                            }
+                                            is TriggerConfig.DateTime -> {
+                                                putSerializable("trigger_datetime", config.time)
+                                                putBoolean("trigger_enabled", config.isEnabled)
+                                            }
                                         }
-                                )
-                                when (val config = segment.triggerConfig) {
-                                    is TriggerConfig.Manual -> {
-                                        putInt("trigger_delay", config.delay)
-                                    }
-                                    is TriggerConfig.DateTime -> {
-                                        putSerializable("trigger_datetime", config.time)
-                                        putBoolean("trigger_enabled", config.isEnabled)
-                                    }
-                                }
-                                // Pass effects
-                                putInt("effects_count", segment.effects.size)
-                                segment.effects.forEachIndexed { index, effect ->
-                                    when (effect) {
-                                        is VibrateEffect -> {
-                                            putSerializable(
-                                                    "effect_${index}_type",
-                                                    EffectType.VIBRATE
-                                            )
-                                        }
-                                        is PauseEffect -> {
-                                            putSerializable(
-                                                    "effect_${index}_type",
-                                                    EffectType.PAUSE
-                                            )
-                                            putInt("effect_${index}_duration", effect.duration)
+                                        // Pass effects
+                                        putInt("effects_count", segment.effects.size)
+                                        segment.effects.forEachIndexed { index, effect ->
+                                            when (effect) {
+                                                is VibrateEffect -> {
+                                                    putSerializable(
+                                                            "effect_${index}_type",
+                                                            EffectType.VIBRATE
+                                                    )
+                                                }
+                                                is PauseEffect -> {
+                                                    putSerializable(
+                                                            "effect_${index}_type",
+                                                            EffectType.PAUSE
+                                                    )
+                                                    putInt(
+                                                            "effect_${index}_duration",
+                                                            effect.duration
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
-                                }
+                            findNavController()
+                                    .navigate(R.id.action_nav_home_to_addSegmentFragment, bundle)
+                        },
+                        onExecuteManual = { segment, _ ->
+                            // Execute the segment when play button is clicked
+                            lifecycleScope.launch { segment.execute() }
+                        },
+                        onToggleDateTime = { segment, position, isEnabled ->
+                            // Update the segment's DateTime trigger enabled state
+                            val currentConfig = segment.triggerConfig as? TriggerConfig.DateTime
+                            if (currentConfig != null) {
+                                val updatedConfig = currentConfig.copy(isEnabled = isEnabled)
+                                segment.updateTriggerConfig(updatedConfig)
+                                homeViewModel.updateSegment(position, segment)
                             }
-                    findNavController().navigate(R.id.action_nav_home_to_addSegmentFragment, bundle)
-                }
+                        }
+                )
         binding.recyclerViewSegments.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = segmentAdapter

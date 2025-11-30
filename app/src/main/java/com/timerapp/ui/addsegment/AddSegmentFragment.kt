@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.textfield.TextInputEditText
@@ -22,7 +21,6 @@ import com.timerapp.model.TriggerType
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import kotlinx.coroutines.launch
 
 class AddSegmentFragment : Fragment() {
 
@@ -68,13 +66,12 @@ class AddSegmentFragment : Fragment() {
             selectedTriggerType = existingTriggerType
             when (existingTriggerType) {
                 TriggerType.MANUAL -> {
-                    val delay = arguments?.getInt("trigger_delay", 0) ?: 0
-                    // Will be set in setupTriggerUI after binding is available
+                    // Delay will be loaded and set in setupTriggerUI after binding is available
                 }
                 TriggerType.DATETIME -> {
+                    // Load the scheduled date/time from arguments
                     selectedDateTime =
                             arguments?.getSerializable("trigger_datetime") as? LocalDateTime
-                    // Will be set in setupTriggerUI after binding is available
                 }
             }
         }
@@ -212,9 +209,6 @@ class AddSegmentFragment : Fragment() {
         // Set up time picker
         binding.buttonSelectTime.setOnClickListener { showTimePicker() }
 
-        // Set up play button
-        binding.buttonPlaySegment.setOnClickListener { executeSegment() }
-
         // Populate UI with existing trigger data if in edit mode
         when (selectedTriggerType) {
             TriggerType.MANUAL -> {
@@ -224,36 +218,9 @@ class AddSegmentFragment : Fragment() {
             }
             TriggerType.DATETIME -> {
                 binding.radioDatetimeTrigger.isChecked = true
-                val isEnabled = arguments?.getBoolean("trigger_enabled", false) ?: false
-                binding.switchTriggerEnabled.isChecked = isEnabled
                 updateDateTimeDisplay()
             }
         }
-    }
-
-    private fun executeSegment() {
-        // Create a temporary segment with current configuration
-        val effects = effectsList.toTypedArray()
-
-        if (effects.isEmpty()) {
-            AlertDialog.Builder(requireContext())
-                    .setTitle("No Effects")
-                    .setMessage("Please add at least one effect to execute the segment.")
-                    .setPositiveButton("OK", null)
-                    .show()
-            return
-        }
-
-        val triggerConfig = getTriggerConfig() ?: TriggerConfig.Manual(delay = 0)
-        val segment =
-                com.timerapp.model.Segment(
-                        name = binding.editTextSegmentName.text.toString().ifEmpty { "Preview" },
-                        effects = effects,
-                        triggerConfig = triggerConfig
-                )
-
-        // Execute the segment in a coroutine
-        lifecycleScope.launch { segment.execute() }
     }
 
     private fun showDatePicker() {
@@ -336,10 +303,14 @@ class AddSegmentFragment : Fragment() {
                 if (selectedDateTime == null) {
                     null
                 } else {
-                    TriggerConfig.DateTime(
-                            time = selectedDateTime!!,
-                            isEnabled = binding.switchTriggerEnabled.isChecked
-                    )
+                    // Preserve existing enabled state if in edit mode, otherwise default to false
+                    val triggerEnabled =
+                            if (isEditMode) {
+                                arguments?.getBoolean("trigger_enabled", false) ?: false
+                            } else {
+                                false
+                            }
+                    TriggerConfig.DateTime(time = selectedDateTime!!, isEnabled = triggerEnabled)
                 }
             }
         }
