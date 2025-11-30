@@ -30,8 +30,12 @@
     <fragment
         android:id="@+id/addSegmentFragment"
         android:name="com.timerapp.ui.addsegment.AddSegmentFragment"
-        android:label="Add Segment"
+        android:label="{title}"
         tools:layout="@layout/fragment_add_segment" >
+        <argument
+            android:name="title"
+            app:argType="string"
+            android:defaultValue="Add Segment" />
         <argument
             android:name="segmentName"
             app:argType="string"

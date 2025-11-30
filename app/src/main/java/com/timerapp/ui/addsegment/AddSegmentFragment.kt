@@ -59,6 +59,9 @@ class AddSegmentFragment : Fragment() {
         segmentName = arguments?.getString("segmentName")
         segmentIndex = arguments?.getInt("segmentIndex", -1) ?: -1
 
+        // Check if we're in edit mode
+        isEditMode = segmentName != null && segmentIndex >= 0
+
         // Load existing trigger configuration if in edit mode
         val existingTriggerType = arguments?.getSerializable("trigger_type") as? TriggerType
         if (existingTriggerType != null) {
@@ -92,17 +95,12 @@ class AddSegmentFragment : Fragment() {
             }
         }
 
-        // Check if we're in edit mode
-        isEditMode = segmentName != null && segmentIndex >= 0
-
         // Set up UI based on mode
         if (isEditMode) {
-            binding.textTitle.text = "Edit Segment"
             binding.editTextSegmentName.setText(segmentName)
             binding.buttonSave.text = "Update"
             binding.buttonDelete.visibility = View.VISIBLE
         } else {
-            binding.textTitle.text = "Add New Segment"
             binding.buttonSave.text = "Save"
             binding.buttonDelete.visibility = View.GONE
         }

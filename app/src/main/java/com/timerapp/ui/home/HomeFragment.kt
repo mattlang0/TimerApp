@@ -45,6 +45,7 @@ class HomeFragment : Fragment() {
                     // Navigate to edit mode when segment is clicked
                     val bundle =
                             Bundle().apply {
+                                putString("title", "Edit Segment")
                                 putString("segmentName", segment.name)
                                 putInt("segmentIndex", position)
                                 // Pass trigger configuration
