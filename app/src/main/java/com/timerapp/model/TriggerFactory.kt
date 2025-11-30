@@ -29,7 +29,7 @@ object TriggerFactory {
      * @param execute The function to execute when trigger fires
      * @return A configured Trigger instance
      */
-    fun create(config: TriggerConfig, execute: () -> Unit): Trigger {
+    fun create(config: TriggerConfig, execute: suspend () -> Unit): Trigger {
         return when (config) {
             is TriggerConfig.Manual -> ManualTrigger(execute).apply { delay = config.delay }
             is TriggerConfig.DateTime ->

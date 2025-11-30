@@ -1,5 +1,7 @@
 package com.timerapp.model.Effect
 
+import com.timerapp.service.PauseService
+
 /**
  * PauseEffect pauses execution for a specified duration. Each instance stores its own duration
  * configuration.
@@ -11,9 +13,7 @@ package com.timerapp.model.Effect
  * ```
  */
 class PauseEffect(val duration: Int) : Effect {
-    override fun execute() {
-        // TODO: Implement actual pause logic
-        // For now, this would block for 'duration' seconds
-        println("Pausing for $duration seconds")
+    override suspend fun execute() {
+        PauseService.pause(duration)
     }
 }

@@ -12,7 +12,7 @@ import com.timerapp.service.VibrateService
  * ```
  */
 class VibrateEffect : Effect {
-    override fun execute() {
+    override suspend fun execute() {
         VibrateService.vibrate()
     }
 }

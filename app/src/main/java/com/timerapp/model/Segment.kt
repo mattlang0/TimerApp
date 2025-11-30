@@ -51,7 +51,7 @@ class Segment(
     }
 
     /** Execute the segment's effects in sequence. */
-    fun execute() {
+    suspend fun execute() {
         effects.forEach { effect -> effect.execute() }
     }
 }

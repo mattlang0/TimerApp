@@ -2,11 +2,11 @@ package com.timerapp.model.Trigger
 
 import java.time.LocalDateTime
 
-class DateTimeTrigger(private val onExecute: () -> Unit) : Trigger {
+class DateTimeTrigger(private val onExecute: suspend () -> Unit) : Trigger {
     var isEnabled: Boolean = false
     var scheduledTime: LocalDateTime? = null
 
-    override fun execute() {
+    override suspend fun execute() {
         if (isEnabled) {
             onExecute()
         }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.textfield.TextInputEditText
@@ -21,6 +22,7 @@ import com.timerapp.model.TriggerType
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import kotlinx.coroutines.launch
 
 class AddSegmentFragment : Fragment() {
 
@@ -252,8 +254,8 @@ class AddSegmentFragment : Fragment() {
                         triggerConfig = triggerConfig
                 )
 
-        // Execute the segment
-        segment.execute()
+        // Execute the segment in a coroutine
+        lifecycleScope.launch { segment.execute() }
     }
 
     private fun showDatePicker() {

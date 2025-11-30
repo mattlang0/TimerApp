@@ -1,5 +1,5 @@
 package com.timerapp.model.Effect
 
 interface Effect {
-    fun execute()
+    suspend fun execute()
 }
